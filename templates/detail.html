@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load staticfiles %} 
+{% block body_titulo %} {{object_list.Arquivo_Lido}} {% endblock body_titulo%} 
+{% block extra_style %}
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+        }
+
+        /* Safari */
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+{% endblock extra_style %} 
+{% block content %}
+<table class="table table-striped table-hover" id="dataTable">
+    <thead>
+        <tr>
+            <th>Campo</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for campo, valor in object_list.Data.items %}
+        <tr>
+            <td>{{ campo }}</td>
+            <td>{{ valor.valor }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<fieldset>
+    <legend>Buscar Valor</legend>
+    <div class="form-inline">
+        <div class="form-group">
+            <label for="latitude">Latitude</label>
+            <input type="text" id="latitude" class="form-control mx-sm-3">
+        </div>
+        <div class="form-group">
+            <label for="longitude">Longitude</label>
+            <input type="text" id="longitude" class="form-control mx-sm-3">
+        </div>
+        <button onclick="buscar();show();" class="btn btn-primary my-1">Buscar</button>
+        <div class="loader" id="loader"></div>
+        <p id="resultado"></p>
+    </div>
+</fieldset>
+{% endblock content %}
+{% block extra_js %}
+    <script>
+        function show() { 
+            document.getElementById('resultado').innerHTML = '';
+            $("#loader").show(); 
+        }
+        $("#loader").hide();
+
+        function buscar() {
+            var url_array = window.location.pathname.split('/');
+            var base_api_url = 'http://drupal.inmet.gov.br:8000/';
+            var api_func = 'getGribData/';
+            var param = url_array[2];
+            var pk = url_array[3];
+            var lat = document.getElementById('latitude').value;
+            var lon = document.getElementById('longitude').value;
+            var api_url = base_api_url + api_func + param + '/' + pk + '/' + lat + '/' + lon;
+
+            $.ajax({
+                url: api_url,
+                dataType: 'json',
+                type: 'get',
+                success: function (response) {
+                    $("#loader").hide();
+                    document.getElementById('resultado').innerHTML = '<b>Ponto:</b> ' + lat + ' ' + lon + '<br /><b>Ponto mais próximo:</b> ' + response['Ponto_Mais_Proximo']['Lat'] + ' ' + response['Ponto_Mais_Proximo']['Lon'] + '<br /><b>Distância:</b> ' + response['Ponto_Mais_Proximo']['Distancia'] + '<br /> <b>Valor:</b> ' + response['Valor'];
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $("#loader").hide();
+                    document.getElementById('resultado').innerHTML = '<b>Não foi possível recuperar nenhum valor.</b>';
+                }
+            });
+        }
+    </script> 
+{% endblock extra_js %}

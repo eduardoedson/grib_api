@@ -1,0 +1,28 @@
+<!DOCTYPE html> 
+{% extends "base.html" %}
+{% load i18n %}
+                   
+{% block body_titulo %} Arquivos GRIB {% endblock body_titulo %}
+
+{% block content %}
+    <table class="table table-striped table-hover" id="dataTable">
+        <thead>
+            <tr>
+                <th>Arquivos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in object_list.Data %}
+            <tr>
+                <td>
+                    <a href="{% url 'parametrosList' object.Arquivo %}">{{ object.Arquivo }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
+
+
+        
+

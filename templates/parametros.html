@@ -1,0 +1,25 @@
+<!DOCTYPE html> 
+{% extends "base.html" %} 
+
+{% block body_titulo %} {{object_list.Arquivo_Lido}} {% endblock body_titulo %} 
+
+{% block content %}
+    <table class="table table-striped table-hover" id="dataTable">
+        <thead>
+            <tr>
+                <th>Parametro</th>
+                <th>Detalhes</th>
+                <th>Sections</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for id, object in object_list.Data.items %}
+            <tr>
+                <td>{{ object.Parametro }}</td>
+                <td><a href="{% url 'detailList' object_list.Arquivo_Lido id %}"><i class="fa fa-plus-circle" aria-hidden="true"></a></i></td>
+                <td><a href="{% url 'sectionsList' object_list.Arquivo_Lido id %}"><i class="fa fa-plus-circle" aria-hidden="true"></a></i></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
